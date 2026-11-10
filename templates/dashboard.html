@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Qonnect GeoAI | Executive Dashboard</title>
+    <title>Qonnect GeoAI | ESIA & Prospectivity Dashboard</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f7f6; }
         header { background: #0A192F; color: white; padding: 20px; text-align: center; }
+        header h1 { margin: 0; font-size: 24px; }
+        header p { margin: 5px 0 0 0; color: #64FFDA; font-size: 14px; }
         .container { display: flex; gap: 20px; padding: 20px; flex-wrap: wrap; }
         .card { background: white; padding: 20px; border-radius: 8px; flex: 1; min-width: 300px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         #map { height: 400px; width: 100%; background: #e5e5e5; }
@@ -17,14 +19,15 @@
 <body>
     <header>
         <h1>Qonnect GeoAI Spatial Intelligence</h1>
-        <p>Executive Dashboard | Al Madar Group</p>
+        <p>Executive Dashboard | ESIA & Mineral Prospectivity</p>
+        <p style="font-size: 12px; color: #8892b0;">Platform Architecture & GeoAI Modeling by Shimeles Tadesse Zelelew</p>
     </header>
     <div class="container">
         <div class="card">
             <select id="projectSelect" onchange="loadData()">
                 <option value="">Loading projects...</option>
             </select>
-            <h2>Geochemical Intelligence</h2>
+            <h2>Geochemical & Environmental Intelligence</h2>
             <div id="map"></div>
         </div>
         <div class="card"><h2>Impact Assessment (KPIs)</h2><canvas id="impactChart"></canvas></div>
@@ -47,13 +50,21 @@
                     select.appendChild(opt);
                 }
                 loadData();
-            })
-            .catch(err => console.error('Error loading projects:', err));
+            });
 
         function loadData() {
             var projectId = document.getElementById('projectSelect').value;
             if(!projectId) return;
             markersLayer.clearLayers();
+            
+            // Map Centering Logic
+            if (projectId == "1") {
+                map.setView([6.456, 37.123], 6); // Ethiopia Mineral
+            } else if (projectId == "2") {
+                map.setView([22.000, 44.000], 6); // Saudi Arabia Mineral
+            } else if (projectId == "3") {
+                map.setView([9.030, 38.740], 8); // ESIA Addis Ababa
+            }
             
             fetch('/api/geochemical-samples?project_id=' + projectId)
                 .then(res => res.json())
@@ -62,14 +73,13 @@
                         var s = data[i];
                         if(s.location_geojson) {
                             var g = JSON.parse(s.location_geojson);
-                            L.circleMarker([g.coordinates[1], g.coordinates[0]], {color: 'red', radius: 5})
+                            // Change color based on project type (Red for minerals, Blue/Orange for ESIA)
+                            var color = (projectId == "3") ? "#FF9800" : "red"; 
+                            
+                            L.circleMarker([g.coordinates[1], g.coordinates[0]], {color: color, radius: 5})
                              .addTo(markersLayer)
-                             .bindPopup('<b>Element:</b> ' + s.element_symbol + '<br><b>Value:</b> ' + s.concentration);
+                             .bindPopup('<b>Indicator:</b> ' + s.element_symbol + '<br><b>Value:</b> ' + s.concentration);
                         }
-                    }
-                    if(data.length > 0) {
-                         var firstG = JSON.parse(data[0].location_geojson);
-                         map.setView([firstG.coordinates[1], firstG.coordinates[0]], 6);
                     }
                 })
                 .catch(err => console.error('Error loading samples:', err));
@@ -82,8 +92,7 @@
                     type: 'bar',
                     data: { labels: ['Baseline', 'Target', 'Actual'], datasets: [{ label: 'Model Accuracy', data: [0.65, 0.85, 0.87], backgroundColor: ['#9e9e9e', '#64FFDA', '#0A192F'] }] }
                 });
-            })
-            .catch(err => console.error('Error loading chart:', err));
+            });
     </script>
 </body>
 </html>
