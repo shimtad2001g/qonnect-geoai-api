@@ -1,0 +1,7 @@
+﻿ref_id,sample_type,latitude,longitude,sample_date,element,concentration,unit
+G-001,Soil,6.456,37.123,2023-10-15,Au,0.85,ppm
+G-002,Soil,6.460,37.130,2023-10-15,Au,1.20,ppm
+G-003,Rock,6.445,37.110,2023-10-16,Cu,150.5,ppm
+G-004,Sediment,6.470,37.140,2023-10-16,As,12.4,ppm
+G-005,Soil,6.452,37.125,2023-10-17,Au,0.45,ppm
+G-006,Water,6.480,37.150,2023-10-17,Cu,25.0,ppb

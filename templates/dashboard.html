@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Qonnect GeoAI | Live Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f7f6; }
+        header { background: #0A192F; color: white; padding: 20px; text-align: center; }
+        .container { display: flex; gap: 20px; padding: 20px; flex-wrap: wrap; }
+        .card { background: white; padding: 20px; border-radius: 8px; flex: 1; min-width: 300px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #map { height: 400px; width: 100%; background: #e5e5e5; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Qonnect GeoAI Spatial Intelligence</h1>
+        <p>Live Data Dashboard</p>
+    </header>
+    <div class="container">
+        <div class="card"><h2>Geochemical Intelligence</h2><div id="map"></div></div>
+        <div class="card"><h2>Impact Assessment (KPIs)</h2><canvas id="impactChart"></canvas></div>
+    </div>
+    <script>
+        var map = L.map('map').setView([6.456, 37.123], 8);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+        
+        fetch('http://127.0.0.1:8000/api/geochemical-samples')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(s => {
+                    if(s.location_geojson) {
+                        var g = JSON.parse(s.location_geojson);
+                        L.circleMarker([g.coordinates[1], g.coordinates[0]], {color: 'red', radius: 8})
+                         .addTo(map)
+                         .bindPopup("<b>Sample:</b> " + s.sample_id + "<br><b>Element:</b> " + s.element_symbol);
+                    }
+                });
+            });
+
+        fetch('http://127.0.0.1:8000/api/impact-scorecard')
+            .then(response => response.json())
+            .then(data => {
+                new Chart(document.getElementById('impactChart'), {
+                    type: 'bar',
+                    data: { 
+                        labels: ['Baseline', 'Target', 'Actual'], 
+                        datasets: [{ label: 'Model Accuracy', data: [0.65, 0.85, 0.87], backgroundColor: ['#9e9e9e', '#64FFDA', '#0A192F'] }] 
+                    }
+                });
+            });
+    </script>
+</body>
+</html>
