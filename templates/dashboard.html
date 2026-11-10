@@ -29,7 +29,7 @@
             attribution: '© OpenStreetMap'
         }).addTo(map);
         
-        fetch('http://127.0.0.1:8000/api/geochemical-samples')
+        fetch('/api/geochemical-samples')
             .then(response => response.json())
             .then(data => {
                 data.forEach(s => {
@@ -42,7 +42,7 @@
                 });
             });
 
-        fetch('http://127.0.0.1:8000/api/impact-scorecard')
+        fetch('/api/impact-scorecard')
             .then(response => response.json())
             .then(data => {
                 new Chart(document.getElementById('impactChart'), {
@@ -56,3 +56,4 @@
     </script>
 </body>
 </html>
+
